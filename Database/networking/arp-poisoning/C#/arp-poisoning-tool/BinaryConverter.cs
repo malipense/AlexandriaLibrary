@@ -15,6 +15,7 @@ namespace arp_poisoning_tool
             Marshal.FreeHGlobal(p);
             return buffer;
         }
+
         public static short Swap(this short value)
         {
             return (short)((ushort)value).Swap();

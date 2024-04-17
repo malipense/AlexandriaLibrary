@@ -1,4 +1,5 @@
-﻿using arp_poisoning_tool.DataStructures;
+﻿using arp_poisoning_tool.DataObjects;
+using arp_poisoning_tool.DataStructures;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -52,8 +53,10 @@ namespace arp_poisoning_tool
 
             _loaded = true;
         }
-        internal void ListNetworkDevices()
+        internal List<NetworkCardInterface> ListNetworkDevices()
         {
+            List<NetworkCardInterface> cards = new List<NetworkCardInterface>();
+
             if(!_loaded)
             {
                 throw new Exception("Module isn't loaded. Make sure you called the Load() method before any other.");
@@ -64,15 +67,17 @@ namespace arp_poisoning_tool
             if (pPcapFindAllDev("rpcap://", null, ref device, ref errorBuffer) == -1)
             {
                 Console.WriteLine("Something went wrong.");
-                return;
+                return null;
             }
 
             while (device.Next != IntPtr.Zero)
             {
                 if (device.Name != null && device.Description != null)
-                    Console.WriteLine($"Name: {device.Name}, Desc: {device.Description}");
+                    cards.Add(new NetworkCardInterface(device.Name, device.Description));
                 device = Marshal.PtrToStructure<DeviceInterface>(device.Next);
             }
+
+            return cards;
         }
 
         internal IntPtr Open(string deviceName)

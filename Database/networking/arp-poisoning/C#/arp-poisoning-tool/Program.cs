@@ -20,14 +20,14 @@ byte[] packet = new byte[size];
 Buffer.BlockCopy(loopback, 0, packet, 0, loopback.Length);
 Buffer.BlockCopy(ip, 0, packet, loopback.Length, ip.Length);
 
-Console.ReadKey();
-
 PcapModule pcapModule = new PcapModule();
 pcapModule.Load();
 
-var ptr = pcapModule.Open("\\Device\\NPF_Loopback");
+Console.ReadKey();
 
-pcapModule.Send(ptr, packet, size);
+//var ptr = pcapModule.Open("\\Device\\NPF_Loopback");
+
+//pcapModule.Send(ptr, packet, size);
 
 string TermsAndUsage()
 {
