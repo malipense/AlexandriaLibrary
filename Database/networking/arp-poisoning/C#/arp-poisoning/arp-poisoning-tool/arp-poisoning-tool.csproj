@@ -6,6 +6,7 @@
     <RootNamespace>arp_poisoning_tool</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
 
 </Project>

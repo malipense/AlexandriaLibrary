@@ -5,6 +5,8 @@
 
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using arp_poisoning_tool.Packets;
+using arp_poisoning_tool;
 
 [DllImport("kernel32.dll", SetLastError = true)]
 extern static IntPtr LoadLibraryEx(string path, IntPtr file, uint flags);
@@ -27,11 +29,16 @@ var pPcapSendPacket = ExportFunction<PcapSendPacket>(module, "pcap_sendpacket");
 var pPcapFindAllDev = ExportFunction<PcapFindAllDevsEx>(module, "pcap_findalldevs_ex");
 var pPcapGetError = ExportFunction<PcapGetError>(module, "pcap_geterr");
 
-IEnumerable<NetworkInterface> cards = NetworkInterface.GetAllNetworkInterfaces().Where(n => n.OperationalStatus == OperationalStatus.Up);
+NetworkInterface[] cards = NetworkInterface.GetAllNetworkInterfaces().Where(n => n.OperationalStatus == OperationalStatus.Up).ToArray();
 
 char[] errbuffer = new char[256];
 
-byte[] packet = new byte[] { 0x00, 0x01, 0x08, 0x00, 0x06, 0x04, 0x00, 0x01, 0xf4, 0x54, 0x20, 0x57, 0xe7, 0x50, 0xc0, 0xa8, 0x0f, 0x01, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xc0, 0xa8, 0x0f, 0xf2 };
+byte[] ethernet = BinaryConverter.GetBytes(DatagramProvider.BuildEthernetPacket("FF:FF:FF:FF:FF:FF", "FF:FF:FF:FF:FF:FF", EthernetProtocolType.ARP));
+
+int size = ethernet.Length;
+
+byte[] packet = new byte[size];
+Buffer.BlockCopy(ethernet, 0, packet, 0, ethernet.Length);
 
 DeviceInterface device;
 
@@ -48,17 +55,17 @@ while (device.Next != IntPtr.Zero)
     device = Marshal.PtrToStructure<DeviceInterface>(device.Next);
 }
 
-IntPtr fp = pPcapOpen("\\Device\\NPF_Loopback", 100, 1, 1000, null, ref errbuffer);
+IntPtr fp = pPcapOpen("rpcap://\\Device\\NPF_Loopback}", 100, 1, 1000, null, ref errbuffer);
 if (fp == IntPtr.Zero)
 {
     Console.WriteLine("Failed to open device.");
     return;
 }
 
-if(pPcapSendPacket(fp, packet, 28) != 0)
+if(pPcapSendPacket(fp, packet, size) != 0)
 {
     IntPtr error = pPcapGetError(fp);
-    Console.WriteLine($"Error sending packet: {Marshal.PtrToStringAnsi(error)}");
+    Console.WriteLine($"Warning! An error might have occurred, you can use a network capture tool to see exactly how the packet looks for the interface adapter: {Marshal.PtrToStringAnsi(error)}");
 }
 
 Console.ReadKey();
