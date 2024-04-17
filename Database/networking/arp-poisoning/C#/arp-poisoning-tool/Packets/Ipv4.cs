@@ -1,10 +1,10 @@
-﻿using System;
+﻿using arp_poisoning_tool.DataStructures;
 
 namespace arp_poisoning_tool.Packets
 {
-    internal struct IPv4
+    internal struct Ipv4
     {
-        public IPv4(ushort totalLength, byte ttl, byte protocol, ushort headerChecksum, uint sourceAddress, uint destinationAddress)
+        public Ipv4(ushort totalLength, byte ttl, byte protocol, ushort headerChecksum, Ipv4Address sourceAddress, Ipv4Address destinationAddress)
         {
             TotalLength = totalLength;
             TTL = ttl;
@@ -22,7 +22,7 @@ namespace arp_poisoning_tool.Packets
         public byte TTL = 0x80; //128 by default
         public byte Protocol;
         public ushort HeaderChecksum;
-        public uint SourceAddress;
-        public uint DestinationAddress;
+        public Ipv4Address SourceAddress;
+        public Ipv4Address DestinationAddress;
     }
 }
