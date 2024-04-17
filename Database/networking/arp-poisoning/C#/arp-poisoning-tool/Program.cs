@@ -9,23 +9,25 @@ using arp_poisoning_tool;
 Console.WriteLine(TermsAndUsage());
 //string target = args[0];
 
-byte[] ethernet = BinaryConverter.GetBytes(DatagramProvider.BuildEthernetPacket("78-2b-46-e9-74-65", "D4-6A-6A-F0-3B-0F", EthernetProtocolType.ARP));
-byte[] arpReply = BinaryConverter.GetBytes(DatagramProvider.BuildArpReplyPacket("00-00-00-00-00-00", "192.168.15.179", "78-2b-46-e9-74-65", "192.168.15.10"));
+byte[] loopback = BinaryConverter.GetBytes(DatagramProvider.BuildLoopbackPacket());
+//byte[] ethernet = BinaryConverter.GetBytes(DatagramProvider.BuildEthernetPacket("78-2b-46-e9-74-65", "D4-6A-6A-F0-3B-0F", EthernetProtocolType.ARP));
+//byte[] arpReply = BinaryConverter.GetBytes(DatagramProvider.BuildArpReplyPacket("00-00-00-00-00-00", "192.168.15.179", "78-2b-46-e9-74-65", "192.168.15.10"));
+byte[] ip = BinaryConverter.GetBytes(DatagramProvider.BuildIpv4Packet(InternetProtocolType.UDP, "192.168.15.9", "192.168.15.10"));
 
-int size = ethernet.Length + arpReply.Length;
+int size = loopback.Length + ip.Length;
 byte[] packet = new byte[size];
 
-Buffer.BlockCopy(ethernet, 0, packet, 0, ethernet.Length);
-Buffer.BlockCopy(arpReply, 0, packet, ethernet.Length, arpReply.Length);
+Buffer.BlockCopy(loopback, 0, packet, 0, loopback.Length);
+Buffer.BlockCopy(ip, 0, packet, loopback.Length, ip.Length);
 
-/*
+Console.ReadKey();
+
 PcapModule pcapModule = new PcapModule();
 pcapModule.Load();
 
-var ptr = pcapModule.Open("\\Device\\NPF_{A72DB444-1FFC-430A-BC65-36094C8868AA}");
+var ptr = pcapModule.Open("\\Device\\NPF_Loopback");
 
 pcapModule.Send(ptr, packet, size);
-*/
 
 string TermsAndUsage()
 {
