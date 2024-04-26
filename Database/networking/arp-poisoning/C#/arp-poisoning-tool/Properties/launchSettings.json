@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "arp-poisoning-tool": {
+      "commandName": "Project",
+      "commandLineArgs": "--interactive"
+    }
+  }
+}

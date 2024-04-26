@@ -7,28 +7,62 @@
 using arp_poisoning_tool;
 
 Console.WriteLine(TermsAndUsage());
-//string target = args[0];
 
-byte[] loopback = BinaryConverter.GetBytes(DatagramProvider.BuildLoopbackPacket());
-//byte[] ethernet = BinaryConverter.GetBytes(DatagramProvider.BuildEthernetPacket("78-2b-46-e9-74-65", "D4-6A-6A-F0-3B-0F", EthernetProtocolType.ARP));
-//byte[] arpReply = BinaryConverter.GetBytes(DatagramProvider.BuildArpReplyPacket("00-00-00-00-00-00", "192.168.15.179", "78-2b-46-e9-74-65", "192.168.15.10"));
-byte[] ip = BinaryConverter.GetBytes(DatagramProvider.BuildIpv4Packet(InternetProtocolType.UDP, "192.168.15.9", "192.168.15.10"));
+string target = args[0];
+if (target == "--interactive")
+{
+    InteractiveMode();
+}
 
-int size = loopback.Length + ip.Length;
-byte[] packet = new byte[size];
 
-Buffer.BlockCopy(loopback, 0, packet, 0, loopback.Length);
-Buffer.BlockCopy(ip, 0, packet, loopback.Length, ip.Length);
-
-PcapModule pcapModule = new PcapModule();
-pcapModule.Load();
 
 Console.ReadKey();
 
-//var ptr = pcapModule.Open("\\Device\\NPF_Loopback");
+void InteractiveMode()
+{
+    PcapModule pcapModule = new PcapModule();
+    pcapModule.Load();
 
-//pcapModule.Send(ptr, packet, size);
+    Console.WriteLine("\nSelect an interface\n");
+    var interfaces = pcapModule.ListNetworkDevices();
 
+    for (int i = 0; i < interfaces.Count; i++)
+    {
+        Console.WriteLine($"{(i + 1)} -- {interfaces[i]}");
+    }
+
+    while (true)
+    {
+        var index = (int)char.GetNumericValue(Console.ReadKey().KeyChar) - 1;
+        var selectedInterface = interfaces[index];
+
+        Console.WriteLine($"\nSelected: {selectedInterface}");
+
+        Console.WriteLine("\nPackages: \n");
+        Console.WriteLine("Ethernet(type, sourcemac, destmac)");
+        var cmd = Console.ReadLine();
+
+        int size = 0;
+        byte[] packet = new byte[size];
+
+        if (cmd.StartsWith("Ethernet"))
+        {
+            var args = cmd.Split('(', ')')[1].Split(',');
+            byte[] ethernet = BinaryConverter.GetBytes(DatagramProvider.BuildEthernetPacket(args[2].Trim(), args[1].Trim(), (EthernetProtocolType)ushort.Parse(args[0])));
+            size += ethernet.Length;
+        }
+        if (cmd == "Send")
+        {
+            
+        }
+        else
+        {
+            byte[] ip = BinaryConverter.GetBytes(DatagramProvider.BuildIpv4Packet(InternetProtocolType.UDP, "192.168.15.9", "192.168.15.10"));
+
+            Buffer.BlockCopy(ip, 0, packet, 0, ip.Length);
+        }
+    }
+}
 string TermsAndUsage()
 {
     return $"This tool was created for education purposes, do not use it improperly.This is part of a major repository available @:\nhttps://github.com/malipense/AlexandriaLibrary\n"
