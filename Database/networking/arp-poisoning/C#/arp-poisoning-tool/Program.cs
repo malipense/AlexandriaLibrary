@@ -14,8 +14,6 @@ if (target == "--interactive")
     InteractiveMode();
 }
 
-
-
 Console.ReadKey();
 
 void InteractiveMode()
@@ -40,10 +38,12 @@ void InteractiveMode()
 
         Console.WriteLine("\nPackages: \n");
         Console.WriteLine("Ethernet(type, sourcemac, destmac)");
-        var cmd = Console.ReadLine();
+        var cmd = Console.ReadLine().ToLower();
 
         int size = 0;
         byte[] packet = new byte[size];
+        byte[] loopback = BinaryConverter.GetBytes((object)DatagramProvider.BuildLoopbackPacket());
+
 
         if (cmd.StartsWith("Ethernet"))
         {
@@ -57,9 +57,7 @@ void InteractiveMode()
         }
         else
         {
-            byte[] ip = BinaryConverter.GetBytes(DatagramProvider.BuildIpv4Packet(InternetProtocolType.UDP, "192.168.15.9", "192.168.15.10"));
-
-            Buffer.BlockCopy(ip, 0, packet, 0, ip.Length);
+            
         }
     }
 }

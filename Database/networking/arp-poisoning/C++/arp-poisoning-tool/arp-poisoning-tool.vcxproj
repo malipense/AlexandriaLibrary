@@ -104,13 +104,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\dev\AlexandriaLibrary\Database\networking\arp-poisoning\C++\arp-poisoning-tool\npcap-sdk-1.13\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\dev\AlexandriaLibrary\Database\networking\arp-poisoning\C++\npcap-sdk-1.13\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <DelayLoadDLLs>wpcap.dll</DelayLoadDLLs>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);C:\dev\AlexandriaLibrary\Database\networking\arp-poisoning\C++\arp-poisoning-tool\npcap-sdk-1.13\Lib\x64\wpcap.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);C:\dev\AlexandriaLibrary\Database\networking\arp-poisoning\C++\npcap-sdk-1.13\Lib\x64\wpcap.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -131,6 +131,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="arp-poisoning-tool.cpp" />
+    <ClCompile Include="datagram-provider.cpp" />
+    <ClCompile Include="pcap-module.cpp" />
+    <ClCompile Include="utilities.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="core-structures.hpp" />
+    <ClInclude Include="datagram-provider.hpp" />
+    <ClInclude Include="packets.hpp" />
+    <ClInclude Include="pcap-module.hpp" />
+    <ClInclude Include="types.hpp" />
+    <ClInclude Include="utilities.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
