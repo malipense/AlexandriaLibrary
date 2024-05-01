@@ -2,6 +2,16 @@
 #include "types.hpp"
 #include "core-structures.hpp"
 
+typedef struct LoopBack {
+	UINT Family;
+} LOOPBACK, * PLOOPBACK;
+
+typedef struct Ethernet {
+	MACADDRESS TargetAddress;
+	MACADDRESS SourceAddress;
+	USHORT Type;
+} ETHERNET, * PETHERNET;
+
 typedef struct IpV4 {
 	BYTE Version = 0x45;
 	BYTE DifferentiateService = 0;
@@ -27,7 +37,3 @@ typedef struct ArpReply {
 	MACADDRESS TargetAddress;
 	IPV4ADDRESS TargetIp;
 } ARPREPLY, *PARPREPLY;
-
-typedef struct LoopBack {
-	UINT Family;
-} LOOPBACK, *PLOOPBACK;

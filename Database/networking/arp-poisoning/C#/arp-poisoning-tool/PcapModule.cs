@@ -111,8 +111,8 @@ namespace arp_poisoning_tool
                 IntPtr error = pPcapGetError(fp);
                 Console.WriteLine($"Warning! An error might have occurred, you can use a network capture tool to see exactly how the packet looks for the interface adapter: {Marshal.PtrToStringAnsi(error)}");
             }
-
-            Console.WriteLine("Packet sent with no warnings.");
+            else
+                Console.WriteLine("Packet sent with no warnings.");
         }
 
         Delegate? ExportDelegate<T>(IntPtr module, string name)

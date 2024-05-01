@@ -13,27 +13,25 @@ int main()
     const char* name = "\\Device\\NPF_Loopback";
     pcap_t* fp = Open(name);
 
-    LOOPBACK loopback;
+    PETHERNET ethernet = CreateEthernetPacket(0, "FF-FF-FF-FF-FF-FF", "FF-FF-FF-FF-FF-FF");
     PIPV4 ipv4 = CreateIpV4Packet(0, "192.168.1.10", "192.168.1.10", 0, 64, NULL, 0);
 
-    loopback.Family = 2;
-
-    int loopbackSize = sizeof(loopback);
-    BYTE* pLoopback = reinterpret_cast<BYTE*>(&loopback);
+    int ethernetSize = sizeof(ethernet);
+    BYTE* pEthernet = reinterpret_cast<BYTE*>(&ethernet);
 
     int ipv4Size = sizeof(*ipv4);
     BYTE* pIpv4 = reinterpret_cast<BYTE*>(ipv4);
 
-    const int totalSize = loopbackSize + ipv4Size;
+    const int totalSize = ethernetSize + ipv4Size;
     BYTE* packet = new BYTE[totalSize];
 
-    for (int i = 0; i < loopbackSize; i++)
+    for (int i = 0; i < ethernetSize; i++)
     {
-        packet[i] = *pLoopback;
-        pLoopback++;
+        packet[i] = *pEthernet;
+        pEthernet++;
     }
 
-    for (int i = loopbackSize; i < totalSize; i++)
+    for (int i = ethernetSize; i < totalSize; i++)
     {
         packet[i] = *pIpv4;
         pIpv4++;
@@ -43,6 +41,7 @@ int main()
 
     delete[] packet;
     free(ipv4);
+    free(ethernet);
 
     return 1;
 }
