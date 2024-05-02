@@ -13,35 +13,35 @@ int main()
     const char* name = "\\Device\\NPF_Loopback";
     pcap_t* fp = Open(name);
 
-    PETHERNET ethernet = CreateEthernetPacket(0, "FF-FF-FF-FF-FF-FF", "FF-FF-FF-FF-FF-FF");
-    PIPV4 ipv4 = CreateIpV4Packet(0, "192.168.1.10", "192.168.1.10", 0, 64, NULL, 0);
+    PETHERNET pEthernet = CreateEthernetPacket(0x0608, "FF-FF-FF-FF-FF-FF", "FF-FF-FF-FF-FF-FF");
+    PARPREPLY pArpReply = CreateArpReplyPacket("FF-FF-FF-FF-FF-FF", "192.168.1.100", "FF-FF-FF-FF-FF-FF", "192.168.1.100");
 
-    int ethernetSize = sizeof(ethernet);
-    BYTE* pEthernet = reinterpret_cast<BYTE*>(&ethernet);
+    int ethernetSize = sizeof(*pEthernet);
+    BYTE* bEthernet = reinterpret_cast<BYTE*>(pEthernet);
 
-    int ipv4Size = sizeof(*ipv4);
-    BYTE* pIpv4 = reinterpret_cast<BYTE*>(ipv4);
+    int arpReplySize = sizeof(*pArpReply);
+    BYTE* bArpReply = reinterpret_cast<BYTE*>(pArpReply);
 
-    const int totalSize = ethernetSize + ipv4Size;
+    const int totalSize = ethernetSize + arpReplySize;
     BYTE* packet = new BYTE[totalSize];
 
     for (int i = 0; i < ethernetSize; i++)
     {
-        packet[i] = *pEthernet;
-        pEthernet++;
+        packet[i] = *bEthernet;
+        bEthernet++;
     }
 
     for (int i = ethernetSize; i < totalSize; i++)
     {
-        packet[i] = *pIpv4;
-        pIpv4++;
+        packet[i] = *bArpReply;
+        bArpReply++;
     }
 
     Send(fp, packet, totalSize);
 
     delete[] packet;
-    free(ipv4);
-    free(ethernet);
+    free(pArpReply);
+    free(pEthernet);
 
     return 1;
 }

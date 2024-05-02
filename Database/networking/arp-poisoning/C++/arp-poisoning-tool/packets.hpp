@@ -32,8 +32,8 @@ typedef struct ArpReply {
 	BYTE HardwareSize = 0x6;
 	BYTE ProtocolSize = 0x4;
 	USHORT OpCode = 0x0200;
-	MACADDRESS SenderAddress;
-	IPV4ADDRESS SenderIp;
-	MACADDRESS TargetAddress;
-	IPV4ADDRESS TargetIp;
+	MACADDRESS SenderAddress = { 0, 0, 0, 0, 0, 0 };
+	IPV4ADDRESS SenderIp = { 0, 0, 0, 0 };
+	MACADDRESS TargetAddress = { 0, 0, 0, 0, 0, 0 };
+	IPV4ADDRESS TargetIp = { 0, 0, 0, 0 };
 } ARPREPLY, *PARPREPLY;

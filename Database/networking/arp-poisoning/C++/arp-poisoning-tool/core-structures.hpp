@@ -2,17 +2,9 @@
 #include "types.hpp"
 
 typedef struct IpV4Address {
-	BYTE B1;
-	BYTE B2;
-	BYTE B3;
-	BYTE B4;
+	BYTE BYTES[4];
 } IPV4ADDRESS;
 
 typedef struct MacAddress {
-	BYTE B1;
-	BYTE B2;
-	BYTE B3;
-	BYTE B4;
-	BYTE B5;
-	BYTE B6;
+	BYTE BYTES[6];
 } MACADDRESS;

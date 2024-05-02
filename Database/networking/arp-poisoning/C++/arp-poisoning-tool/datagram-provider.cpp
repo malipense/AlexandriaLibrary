@@ -29,22 +29,20 @@ void ValidatePhysicalAddress(const char* physicalAddress)
 	}
 }
 
-BYTE* GetBytesFromMACString(const char* str)
+MACADDRESS GetMACFromMACString(const char* str)
 {
-	BYTE byteArray[6];
-	std::vector<BYTE> vector;
+	MACADDRESS mac;
+	int arrayIndex = 0;
 
 	size_t size = strlen(str);
 	std::string address(12, '0');
-	int index = 0;
+	int addressIndex = 0;
 	for (int i = 0; i < size; i++)
 	{
 		if (isxdigit(str[i]))
 		{
-			address[index] = str[i];
-			
-			std::cout << address[index] << std::endl;
-			index++;
+			address[addressIndex] = str[i];
+			addressIndex++;
 		}
 	}
 
@@ -53,11 +51,39 @@ BYTE* GetBytesFromMACString(const char* str)
 		BYTE byteValue = static_cast<BYTE>(
 			stoi(byteString, nullptr, 16));
 
-		vector.push_back(byteValue);
+		mac.BYTES[arrayIndex] = byteValue;
+		arrayIndex++;
 	}
 
-	std::copy(vector.begin(), vector.end(), byteArray);
-	return byteArray;
+	return mac;
+}
+
+IPV4ADDRESS GetIPFromIPString(const char* str)
+{
+	IPV4ADDRESS ip;
+	int index = 0;
+	std::vector<BYTE> vector;
+
+	size_t size = strlen(str);
+
+	std::string address = str;
+	size_t pos = 0;
+
+	std::string delimiter = ".";
+	std::string token;
+	while ((pos = address.find(delimiter)) != std::string::npos) {
+		token = address.substr(0, pos);
+
+		BYTE byteValue = static_cast<BYTE>(
+			stoi(token, nullptr, 10));
+
+		ip.BYTES[index] = byteValue;
+		address.erase(0, pos + delimiter.length());
+		index++;
+	}
+	ip.BYTES[3] = static_cast<BYTE>(stoi(address, nullptr, 10));
+
+	return ip;
 }
 
 PIPV4 CreateIpV4Packet(BYTE protocol, const char* sourceIp, const char* destinationIp, int identification, int ttl, BYTE* payload, int payloadSize)
@@ -106,25 +132,14 @@ PETHERNET CreateEthernetPacket(USHORT type, const char* targetAddress, const cha
 	ValidatePhysicalAddress(targetAddress);
 	ValidatePhysicalAddress(sourceAddress);
 
-	BYTE* target = GetBytesFromMACString(targetAddress);
-	BYTE* source = GetBytesFromMACString(sourceAddress);
+	MACADDRESS target = GetMACFromMACString(targetAddress);
+	MACADDRESS source = GetMACFromMACString(sourceAddress);
 
 	ETHERNET packet;
 	packet.Type = type;
 
-	packet.TargetAddress.B1 = target[0];
-	packet.TargetAddress.B2 = target[1];
-	packet.TargetAddress.B3 = target[2];
-	packet.TargetAddress.B4 = target[3];
-	packet.TargetAddress.B5 = target[4];
-	packet.TargetAddress.B6 = target[5];
-
-	packet.SourceAddress.B1 = source[0];
-	packet.SourceAddress.B2 = source[1];
-	packet.SourceAddress.B3 = source[2];
-	packet.SourceAddress.B4 = source[3];
-	packet.SourceAddress.B5 = source[4];
-	packet.SourceAddress.B6 = source[5];
+	packet.TargetAddress = target;
+	packet.SourceAddress = source;
 
 	int size = sizeof(packet);
 	void* heap = malloc(size);
@@ -142,5 +157,33 @@ PETHERNET CreateEthernetPacket(USHORT type, const char* targetAddress, const cha
 
 PARPREPLY CreateArpReplyPacket(const char* senderAddress, const char* senderIp, const char* targetAddress, const char* targetIp)
 {
+	ValidatePhysicalAddress(targetAddress);
+	ValidatePhysicalAddress(senderAddress);
 
+	MACADDRESS bTarget = GetMACFromMACString(targetAddress);
+	MACADDRESS bSender = GetMACFromMACString(senderAddress);
+
+	IPV4ADDRESS bTargetIp = GetIPFromIPString(targetIp);
+	IPV4ADDRESS bSenderIp = GetIPFromIPString(senderIp);
+
+	ARPREPLY packet;
+
+	packet.TargetAddress = bTarget;
+	packet.SenderAddress = bSender;
+
+	packet.TargetIp = bTargetIp;
+	packet.SenderIp = bSenderIp;
+
+	int size = sizeof(packet);
+	void* heap = malloc(size);
+
+	if (heap == 0)
+	{
+		std::cerr << "Failed to allocate heap memory." << std::endl;
+		exit(1);
+	}
+
+	memcpy(heap, &packet, size);
+
+	return reinterpret_cast<PARPREPLY>(heap);
 }

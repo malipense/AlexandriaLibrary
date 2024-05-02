@@ -1,12 +1,4 @@
-﻿/*
-    As the Win32 network libraries are limited to the creation of layer 3 packets, we are required to use Ncap
-    to overcome that: https://npcap.com/guide/
-    https://www.quora.com/Why-is-the-ARP-table-not-updating-itself-when-a-new-device-enters-the-LAN-I-have-to-ping-to-that-IP-in-order-to-find-its-entry-in-ARP-table-What-is-the-alternative-to-find-the-IP-address-of-a-specific-MAC-address#:~:text=Your%20ARP%20table%20is%20only,your%20ARP%20table%20is%20updated.
-    https://www.practicalnetworking.net/series/arp/gratuitous-arp/
-    https://www.practicalnetworking.net/series/arp/traditional-arp/
-*/
-
-using arp_poisoning_tool;
+﻿using arp_poisoning_tool;
 using arp_poisoning_tool.Packets;
 
 Console.WriteLine(TermsAndUsage());
@@ -44,7 +36,7 @@ void InteractiveMode()
     
     if (interfaceSelected)
     {
-        Console.WriteLine("1 - Ethernet 2 - IPv4 3 - ARP Reply 4 - Send");
+        Console.WriteLine("1 - Ethernet\n3 - ARP Reply\n4 - Send");
         var choice = Console.ReadKey().KeyChar;
         byte[] packetBytes = new byte[256];
         int currentIndex = 0;
@@ -73,6 +65,7 @@ void InteractiveMode()
                     validPacket = true;
                     break;
                 case '2':
+                    Console.WriteLine("\n");
                     break;
                 case '3':
                     Console.WriteLine("\nSender MacAddress");
@@ -92,9 +85,11 @@ void InteractiveMode()
 
                     Buffer.BlockCopy(replyB, 0, packetBytes, currentIndex, replyB.Length);
                     currentIndex += replyB.Length;
+
+                    Console.WriteLine("Arp reply packet created.");
                     break;
             }
-            Console.WriteLine("1 - Ethernet 2 - IPv4 3 - ARP Reply 4 - Send");
+            Console.WriteLine("1 - Ethernet\n3 - ARP Reply\n4 - Send");
             choice = Console.ReadKey().KeyChar;
         }
 
